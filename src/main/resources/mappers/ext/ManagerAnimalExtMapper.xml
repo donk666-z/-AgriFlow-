@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.briup.product_source.dao.ext.ManagerAnimalExtMapper">
+
+    <!-- 自定义映射规则 -->
+    <resultMap id="AnimalExtResult" type="ManagerAnimalExt"
+            extends="com.briup.product_source.dao.ManagerAnimalMapper.BaseResultMap">
+        <!-- 栏圈名称、栏舍名称、二维码图片 -->
+        <result column="h_name" property="managerHurdles"/>
+        <result column="fh_name" property="managerFenceHouse"/>
+        <result column="q_image_url" property="url"/>
+
+        <!-- 一对一 映射批次对象 -->
+        <association property="managerBatch"
+                     resultMap="com.briup.product_source.dao.ManagerBatchMapper.BaseResultMap"/>
+    </resultMap>
+
+    <!--多表连接查询，注意栏圈表、栏舍表、二维码表，都只需要查询一个字段即可-->
+    <select id="selectAnimalRelated" resultMap="AnimalExtResult">
+        SELECT ma.*,mh.h_name,fh.fh_name,mq.q_image_url,mb.*
+        FROM manager_animal ma
+            LEFT JOIN manager_hurdles mh ON ma.a_hurdles_id = mh.h_id
+            LEFT JOIN manager_fence_house fh ON mh.h_fence_id = fh.fh_id
+            LEFT JOIN manager_batch mb ON mb.b_serial_id = ma.a_batch_id
+            LEFT JOIN manager_qrcode mq ON ma.a_animal_id = mq.q_animal_id
+        <where>
+            <if test="aHealthy != null and aHealthy != ''">
+                a_healthy = #{aHealthy}
+            </if>
+            <if test="aGender != null and aGender != ''">
+                AND a_gender = #{aGender}
+            </if>
+        </where>
+    </select>
+
+</mapper>

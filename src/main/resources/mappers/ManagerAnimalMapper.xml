@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.briup.product_source.dao.ManagerAnimalMapper">
+    <!--基础查询结果集-->
+    <resultMap id="BaseResultMap" type="managerAnimal">
+        <id column="a_animal_id" property="aAnimalId"/>
+        <result column="a_weight" property="aWeight"/>
+        <result column="a_gender" property="aGender"/>
+        <result column="a_healthy" property="aHealthy"/>
+        <result column="a_status" property="aStatus"/>
+        <result column="a_inoculate" property="aInoculate"/>
+        <result column="a_time" property="aTime"/>
+        <result column="a_batch_id" property="aBatchId"/>
+        <result column="a_hurdles_id" property="aHurdlesId"/>
+    </resultMap>
+
+    <!--基础sql字段-->
+    <sql id="Base_Column_List">
+        a_animal_id
+        , a_weight, a_gender, a_healthy, a_status, a_inoculate, a_time, a_batch_id, a_hurdles_id
+    </sql>
+
+    <!--根据动物编号查询动物信息-->
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from manager_animal
+        where a_animal_id = #{aAnimalId}
+    </select>
+
+    <!--根据编号修改动物健康状态-->
+    <update id="updateHealthyByAnimalId">
+        update manager_animal
+        set a_healthy = #{healthy}
+        where a_animal_id = #{animalId}
+    </update>
+
+    <!--根据编号修改动物信息-->
+    <update id="updateByPrimaryKey">
+        update manager_animal
+        <set>
+            <if test="aWeight != null and aWeight != ''">
+                a_weight = #{aWeight},
+            </if>
+            <if test="aGender != null and aGender != ''">
+                a_gender = #{aGender},
+            </if>
+            <if test="aHealthy != null and aHealthy != ''">
+                a_healthy = #{aHealthy},
+            </if>
+            <if test="aStatus != null and ''">
+                a_status = #{aStatus},
+            </if>
+            <if test="aInoculate != null and aInoculate !=''">
+                a_inoculate = #{aInoculate},
+            </if>
+            <if test="aTime != null">
+                a_time = #{aTime},
+            </if>
+            <if test="aBatchId != null and aBatchId != ''">
+                a_batch_id = #{aBatchId},
+            </if>
+            <if test="aHurdlesId != null and aHurdlesId != ''">
+                a_hurdles_id = #{aHurdlesId}
+            </if>
+        </set>
+        where a_animal_id = #{aAnimalId}
+    </update>
+
+    <insert id="insert">
+        insert into manager_animal (
+                        a_animal_id, a_weight, a_gender,
+                        a_healthy, a_status, a_inoculate,
+                        a_time, a_batch_id, a_hurdles_id)
+        values (#{aAnimalId}, #{aWeight}, #{aGender},
+                #{aHealthy}, #{aStatus}, #{aInoculate},
+                #{aTime}, #{aBatchId}, #{aHurdlesId})
+    </insert>
+
+    <!--大屏统计动物体重：30以下,30-50,50以上
+        查询结果映射到 map对象中
+        例如：{
+                "30以下": 13,
+                "50以上": 3,
+                ...
+             }
+    -->
+    <select id="countWeight" resultType="map">
+        SELECT COUNT(a_weight <![CDATA[<]]> 30 OR NULL) as "30以下",
+               COUNT(a_weight > 50 OR NULL) as "50以上",
+               COUNT(a_weight >= 30
+                         AND a_weight <![CDATA[<=]]> 50 OR NULL) as "30~50"
+        from manager_animal
+    </select>
+
+</mapper>
