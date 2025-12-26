@@ -1,9 +1,11 @@
 package com.briup.product_source.dao;
 
 import com.briup.product_source.pojo.ManagerHurdles;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
-
+@Service
 public interface ManagerHurdlesMapper {
     //根据栏舍编号查询该栏舍有多少个栏圈
     int selectCountByFhId(String fhId);
@@ -22,4 +24,8 @@ public interface ManagerHurdlesMapper {
 
     //更新栏圈信息
     int updateByPrimaryKey(ManagerHurdles hurdles);
+
+    int deleteByPrimaryKey(String hId);
+
+    int deleteBatchByIds(@Param("ids") List<String> ids);
 }

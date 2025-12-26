@@ -11,6 +11,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -73,6 +74,42 @@ public class QuarantineRegistrationServiceImpl implements QuarantineRegistration
         //5.修改指定批次检疫状态为"已检疫"及检疫合格状态 bQualified
         String bQualified = qr.getBQualified();
         if (batchMapper.updateQualifiedById(bQualified, grBatchId) == 0) {
+            throw new ServiceException(ResultCode.FAIL);
+        }
+    }
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteById(Integer grId) {
+        // 1. 校验参数
+        if (grId == null) {
+            throw new ServiceException(ResultCode.PARAM_IS_EMPTY);
+        }
+
+        // 2. 执行删除
+        int result = qrMapper.deleteByPrimaryKey(grId);
+
+        // 3. 判断结果
+        if (result == 0) {
+            throw new ServiceException(ResultCode.DATA_IS_EMPTY); // 或者 FAIL
+        }
+
+        // 可选：这里可以添加逻辑，如果删除检疫单，是否需要把对应批次的状态改回"未检疫"？
+        // 暂时保持简单，只删除记录。
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteBatch(List<Integer> ids) {
+        // 1. 校验参数
+        if (ids == null || ids.isEmpty()) {
+            throw new ServiceException(ResultCode.PARAM_IS_EMPTY);
+        }
+
+        // 2. 执行批量删除
+        int result = qrMapper.deleteBatch(ids);
+
+        // 3. 判断结果
+        if (result == 0) {
             throw new ServiceException(ResultCode.FAIL);
         }
     }

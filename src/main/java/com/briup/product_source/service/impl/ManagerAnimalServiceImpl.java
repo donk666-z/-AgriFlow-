@@ -15,6 +15,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -66,6 +67,14 @@ public class ManagerAnimalServiceImpl implements ManagerAnimalService {
         ManagerHurdles hurdlesNew = hurdlesMapper.selectByPrimaryKey(aHurdlesIdNew);
         if (hurdlesNew == null) {
             throw new ServiceException(ResultCode.HURDLES_NOT_EXIST);
+        }
+
+        // ✅ 【新增】防御性校验：先看满了没！
+// 如果状态是"已满"，或者 存栏量 >= 最大值，严禁入栏！
+        if ("已满".equals(hurdlesNew.getHFull()) || hurdlesNew.getHSaved() >= hurdlesNew.getHMax()) {
+            // 抛出一个异常，告诉前端：这个圈满了，换一个！
+            // (你可能需要在 ResultCode 里加一个 HURDLES_IS_FULL)
+            throw new ServiceException(ResultCode.HURDLES_IS_FULL);
         }
 
         //3.添加或者修改动物信息
@@ -142,6 +151,46 @@ public class ManagerAnimalServiceImpl implements ManagerAnimalService {
                 hurdlesNew.setHFull("已满");
             }
             hurdlesMapper.updateByPrimaryKey(hurdlesNew);
+        }
+    }
+    @Override
+    @Transactional(rollbackFor = Exception.class) // 开启事务
+    public void deleteById(String id) {
+        // 1. 查询动物是否存在
+        ManagerAnimal animal = animalMapper.selectByPrimaryKey(id);
+        if (animal == null) {
+            throw new ServiceException(ResultCode.DATA_IS_EMPTY);
+        }
+
+        // 2. 获取该动物所在的栏圈ID
+        String hurdlesId = animal.getAHurdlesId();
+        if (StringUtils.hasText(hurdlesId)) {
+            ManagerHurdles hurdle = hurdlesMapper.selectByPrimaryKey(hurdlesId);
+            if (hurdle != null) {
+                // 3. 维护栏圈数据：存栏量 - 1
+                int currentSaved = hurdle.getHSaved() == null ? 0 : hurdle.getHSaved();
+                if (currentSaved > 0) {
+                    hurdle.setHSaved(currentSaved - 1);
+                    // 4. 如果之前是"已满"，现在减了一个，肯定变成"未满"
+                    //    或者简单点，只要没达到Max，就是未满 (这里直接置为未满即可，除非Max是0)
+                    if ("已满".equals(hurdle.getHFull())) {
+                        hurdle.setHFull("未满");
+                    }
+                    hurdlesMapper.updateByPrimaryKey(hurdle);
+                }
+            }
+        }
+
+        // 5. 执行物理删除
+        animalMapper.deleteByPrimaryKey(id);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteBatch(List<String> ids) {
+        // 复用单删逻辑，确保每一条删除都能正确扣减库存
+        for (String id : ids) {
+            deleteById(id);
         }
     }
 }

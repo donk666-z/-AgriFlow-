@@ -35,7 +35,7 @@ public enum ResultCode {
 	/* 动物管理模块错误 4001 - 4999 */
 	ANIMAL_IS_NOT_IN_BREEDING(4001, "动物不在养殖中，无法添加病症记录"),
 	ANIMAL_NOT_EXIST(4002, "动物不存在"),
-
+	HURDLES_IS_FULL(4003, "目标栏圈已满，禁止入栏"),
 	//批次
 	BATCH_NOT_EXIST(4005, "该批次不存在")
 

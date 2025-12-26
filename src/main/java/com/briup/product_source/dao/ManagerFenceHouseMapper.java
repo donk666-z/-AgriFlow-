@@ -1,11 +1,13 @@
 package com.briup.product_source.dao;
 
 import com.briup.product_source.pojo.ManagerFenceHouse;
+import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
+@Mapper
 public interface ManagerFenceHouseMapper {
     //条件查询栏舍
     List<ManagerFenceHouse> queryAllHouses(String fhName);

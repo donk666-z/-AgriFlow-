@@ -10,6 +10,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Api(tags = "动物管理模块")
 @RestController
 @RequestMapping("/animal")
@@ -32,6 +34,20 @@ public class AnimalController {
     @PostMapping("/saveOrUpdate")
     public Result reviseAnimalInfo(@RequestBody ManagerAnimal animal) {
         animalService.saveOrUpdate(animal);
+        return Result.success();
+    }
+
+    @ApiOperation("根据编号删除动物")
+    @DeleteMapping("/deleteById/{id}")
+    public Result removeById(@PathVariable String id) {
+        animalService.deleteById(id);
+        return Result.success();
+    }
+
+    @ApiOperation("批量删除动物")
+    @DeleteMapping("/deleteByIdAll")
+    public Result removeBatch(@RequestBody List<String> ids) {
+        animalService.deleteBatch(ids);
         return Result.success();
     }
 }

@@ -90,4 +90,17 @@
         </set>
         where h_id = #{hId}
     </update>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+        delete from manager_hurdles
+        where h_id = #{hId,jdbcType=VARCHAR}
+    </delete>
+
+    <delete id="deleteBatchByIds">
+        delete from manager_hurdles
+        where h_id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
 </mapper>

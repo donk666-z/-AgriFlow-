@@ -25,4 +25,10 @@ public interface HurdlesService {
 
     //查询所有栏圈信息(可用、未满)
     List<ManagerHurdles> findAllEnable();
+
+        // 根据id删除栏圈
+        void removeById(String hId);
+
+        // 批量删除（可选，为了完整性建议加上）
+        void removeBatch(List<String> hIds);
 }

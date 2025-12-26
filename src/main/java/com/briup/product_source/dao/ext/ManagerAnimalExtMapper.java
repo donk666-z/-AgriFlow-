@@ -1,9 +1,10 @@
 package com.briup.product_source.dao.ext;
 
 import com.briup.product_source.pojo.ext.ManagerAnimalExt;
+import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
-
+@Mapper
 public interface ManagerAnimalExtMapper {
 
     //条件查询动物信息(含栏圈名称、栏舍名称及批次信息)

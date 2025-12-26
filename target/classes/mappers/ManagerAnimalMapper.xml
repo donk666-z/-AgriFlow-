@@ -93,4 +93,17 @@
         from manager_animal
     </select>
 
+    <delete id="deleteByPrimaryKey">
+        delete from manager_animal
+        where a_animal_id = #{aAnimalId}
+    </delete>
+
+    <delete id="deleteBatchIds">
+        delete from manager_animal
+        where a_animal_id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
 </mapper>

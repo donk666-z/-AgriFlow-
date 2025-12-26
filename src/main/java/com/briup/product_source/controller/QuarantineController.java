@@ -11,6 +11,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Api(tags = "检疫登记模块")
 @RestController
 @RequestMapping("/quarantineRegistration")
@@ -37,5 +39,20 @@ public class QuarantineController {
     public Result reviseRegistration(@RequestBody QuarantineRegistration recode) {
         qrService.saveOrUpdate(recode);
         return Result.success("操作成功");
+    }
+
+    @ApiOperation("按id删除检验记录接口")
+    @ApiImplicitParam(name = "grId",value="检疫记录ID",required = true,dataType = "int")
+    @DeleteMapping("/deleteById/{grId}")
+    public Result deleteById(@PathVariable Integer grId) {
+        qrService.deleteById(grId);
+        return Result.success("删除成功");
+    }
+
+    @ApiOperation("批量删除检疫记录")
+    @DeleteMapping("/deleteByIdAll")
+    public Result deleteBatch(@RequestBody List<Integer> ids){
+        qrService.deleteBatch(ids);
+        return Result.success("批量删除成功");
     }
 }

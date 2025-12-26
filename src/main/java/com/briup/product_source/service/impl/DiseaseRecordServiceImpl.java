@@ -15,6 +15,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -106,6 +107,40 @@ public class DiseaseRecordServiceImpl implements DiseaseRecordService {
             healthy = "生病";
         }
         if (animalMapper.updateHealthyByAnimalId(healthy, animalId) == 0) {
+            throw new ServiceException(ResultCode.FAIL);
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteById(Integer id) {
+        // 1. 参数校验
+        if (id == null) {
+            throw new ServiceException(ResultCode.PARAM_IS_EMPTY);
+        }
+
+        // 2. 执行删除
+        int result = dRecordMapper.deleteByPrimaryKey(id);
+
+        // 3. 结果验证
+        if (result == 0) {
+            throw new ServiceException(ResultCode.DATA_IS_EMPTY);
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteBatch(List<Integer> ids) {
+        // 1. 参数校验
+        if (ids == null || ids.isEmpty()) {
+            throw new ServiceException(ResultCode.PARAM_IS_EMPTY);
+        }
+
+        // 2. 执行批量删除
+        int result = dRecordMapper.deleteBatch(ids);
+
+        // 3. 结果验证
+        if (result == 0) {
             throw new ServiceException(ResultCode.FAIL);
         }
     }

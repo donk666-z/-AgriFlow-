@@ -1,9 +1,10 @@
 package com.briup.product_source.dao;
 
 import com.briup.product_source.pojo.ManagerBatch;
+import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
-
+@Mapper
 public interface ManagerBatchMapper {
     //查询所有未检疫的批次信息
     List<ManagerBatch> selectAllUnquarantined();

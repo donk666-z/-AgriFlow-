@@ -19,4 +19,10 @@ public interface DiseaseRecordService {
 
     //新增|修改 治疗记录
     void saveOrUpdate(DiseaseRecord record);
+
+    // 【修改】根据id删除病症信息 (注意：改为 Integer)
+    void deleteById(Integer id);
+
+    // 【修改】批量删除病症信息 (注意：改为 Integer)
+    void deleteBatch(List<Integer> ids);
 }

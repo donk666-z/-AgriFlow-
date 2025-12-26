@@ -18,6 +18,7 @@ import java.util.Map;
 @Api(tags = "栏圈管理模块")
 @RestController
 @RequestMapping("/hurdle")
+@CrossOrigin
 public class HurdleController {
     @Autowired
     private HurdlesService hurdlesService;
@@ -69,5 +70,19 @@ public class HurdleController {
     public Result getAllEnableHurdles(){
         List<ManagerHurdles> list = hurdlesService.findAllEnable();
         return Result.success(list);
+    }
+
+    @ApiOperation("根据编号删除栏圈")
+    @DeleteMapping("/deleteById/{hId}")
+    public Result removeById(@PathVariable String hId) {
+        hurdlesService.removeById(hId);
+        return Result.success();
+    }
+
+    @ApiOperation("批量删除栏圈")
+    @DeleteMapping("/deleteByIdAll")
+    public Result removeBatch(@RequestBody List<String> hIds) {
+        hurdlesService.removeBatch(hIds);
+        return Result.success();
     }
 }

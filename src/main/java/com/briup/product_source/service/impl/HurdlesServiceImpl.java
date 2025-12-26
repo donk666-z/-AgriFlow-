@@ -101,4 +101,39 @@ public class HurdlesServiceImpl implements HurdlesService {
         List<ManagerHurdles> list = hurdlesMapper.selectAllEnable();
         return list;
     }
+
+    @Override
+    public void removeById(String hId) {
+        // 1. 校验参数
+        if (hId == null) {
+            throw new ServiceException(ResultCode.PARAM_IS_EMPTY);
+        }
+
+        // 2. 查询栏圈信息
+        ManagerHurdles hurdle = hurdlesMapper.selectByPrimaryKey(hId);
+        if (hurdle == null) {
+            throw new ServiceException(ResultCode.DATA_IS_EMPTY);
+        }
+
+        // 3. 【关键业务逻辑】校验栏圈是否为空
+        // 如果存栏量(hSaved) > 0，说明里面还有动物，不能删！
+        if (hurdle.getHSaved() != null && hurdle.getHSaved() > 0) {
+            // 这里建议抛出一个具体的错误，或者暂时用 FAIL
+            // 也可以自定义一个 ResultCode.HURDLE_NOT_EMPTY
+            throw new ServiceException(ResultCode.DATA_CAN_NOT_DELETE);
+        }
+
+        // 4. 执行删除
+        hurdlesMapper.deleteByPrimaryKey(hId);
+    }
+
+    @Override
+    public void removeBatch(List<String> hIds) {
+        // 简单实现：循环调用单删逻辑，利用上面的校验机制
+        if (hIds == null || hIds.isEmpty()) return;
+
+        for (String id : hIds) {
+            removeById(id);
+        }
+    }
 }
